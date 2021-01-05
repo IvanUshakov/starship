@@ -8,10 +8,12 @@ use crate::utils;
 ///
 /// Will display the Swift version if any of the following criteria are met:
 ///     - The current directory contains a `Package.swift` file
+///     - The current directory contains a `Podfile` file
 ///     - The current directory contains a file with extension `.swift`
 pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
     let is_swift_project = context
         .try_begin_scan()?
+        .set_files(&["Podfile"])
         .set_extensions(&["swift"])
         .is_match();
 
@@ -110,6 +112,19 @@ mod tests {
     fn folder_with_swift_file() -> io::Result<()> {
         let dir = tempfile::tempdir()?;
         File::create(dir.path().join("main.swift"))?.sync_all()?;
+        let actual = ModuleRenderer::new("swift").path(dir.path()).collect();
+        let expected = Some(format!(
+            "via {} ",
+            Color::Fixed(202).bold().paint("🐦 v5.2.2")
+        ));
+        assert_eq!(expected, actual);
+        dir.close()
+    }
+
+    #[test]
+    fn folder_with_podfile_file() -> io::Result<()> {
+        let dir = tempfile::tempdir()?;
+        File::create(dir.path().join("Podfile"))?.sync_all()?;
         let actual = ModuleRenderer::new("swift").path(dir.path()).collect();
         let expected = Some(format!(
             "via {} ",

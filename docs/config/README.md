@@ -2311,6 +2311,7 @@ The `swift` module shows the currently installed version of Swift.
 The module will be shown if any of the following conditions are met:
 
 - The current directory contains a `Package.swift` file
+- The current directory contains a `Podfile` file
 - The current directory contains a file with the `.swift` extension
 
 ### Options
